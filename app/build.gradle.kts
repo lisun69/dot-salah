@@ -12,8 +12,8 @@ android {
         applicationId = "com.abidur.dotsalah"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
     }
 
     // Signing key comes from GitHub Secrets. It is never stored in this public repo.

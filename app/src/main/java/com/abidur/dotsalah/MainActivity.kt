@@ -65,7 +65,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        tick.intValue = tick.intValue + 1 // reload after ticking from the widget
+        tick.intValue = tick.intValue + 1
     }
 }
 
@@ -133,6 +133,72 @@ fun Tabs(selected: Int, onSelect: (Int) -> Unit) {
     }
 }
 
+// ---------------------------------------------------------------- RAMADAN (shows only during Ramadan)
+@Composable
+fun RamadanCard(key: Int, now: Long) {
+    val ctx = LocalContext.current
+    val today = Salah.today()
+    val dayN = remember(key, today) { Ramadan.dayNumber(ctx, today) } ?: return
+    val t = remember(key, today) { Salah.times(ctx, today) }
+    val tomorrowSehri = remember(key, today) { Salah.times(ctx, today.plusDays(1)).sehri }
+    var showAll by rememberSaveable { mutableStateOf(false) }
+
+    val (label, target) = when {
+        now < t.sehri -> "SEHRI ENDS IN" to t.sehri
+        now < t.iftar -> "IFTAR IN" to t.iftar
+        else -> "SEHRI ENDS IN" to tomorrowSehri
+    }
+
+    NCardBox {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            RedDot(7.dp)
+            Spacer(Modifier.width(8.dp))
+            NLabel("Ramadan · Day $dayN", Modifier.weight(1f))
+            NText(Hijri.label(Hijri.of(ctx, today)), 10.sp, NGrey, maxLines = 1)
+        }
+        Spacer(Modifier.height(16.dp))
+        Row {
+            Column(Modifier.weight(1f)) {
+                NLabel("Sehri ends")
+                Spacer(Modifier.height(4.dp))
+                NText(Fmt.time(ctx, t.sehri), 20.sp)
+            }
+            Column(Modifier.weight(1f), horizontalAlignment = Alignment.End) {
+                NLabel("Iftar")
+                Spacer(Modifier.height(4.dp))
+                NText(Fmt.time(ctx, t.iftar), 20.sp, NRed)
+            }
+        }
+        Spacer(Modifier.height(12.dp))
+        NText("$label ${Fmt.countdown(target - now)}", 13.sp, NRed)
+        Spacer(Modifier.height(14.dp))
+        NButton(if (showAll) "Hide timetable" else "Full Ramadan timetable", modifier = Modifier.fillMaxWidth()) { showAll = !showAll }
+
+        if (showAll) {
+            val list = remember(key, today) { Ramadan.timetable(ctx) }
+            Spacer(Modifier.height(12.dp))
+            Row(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+                NText("DAY", 10.sp, NGrey, Modifier.weight(0.7f))
+                NText("DATE", 10.sp, NGrey, Modifier.weight(1.2f))
+                NText("SEHRI", 10.sp, NGrey, Modifier.weight(1.3f))
+                NText("IFTAR", 10.sp, NGrey, Modifier.weight(1.3f), align = TextAlign.End)
+            }
+            list.forEach { d ->
+                val isToday = d.date == today
+                val col = if (isToday) NRed else if (d.date.isBefore(today)) NGrey else NWhite
+                Row(Modifier.fillMaxWidth().padding(vertical = 5.dp)) {
+                    NText("${d.n}", 12.sp, col, Modifier.weight(0.7f))
+                    NText(Fmt.shortDate(d.date), 12.sp, col, Modifier.weight(1.2f))
+                    NText(Fmt.time(ctx, d.sehri), 12.sp, col, Modifier.weight(1.3f))
+                    NText(Fmt.time(ctx, d.iftar), 12.sp, col, Modifier.weight(1.3f), align = TextAlign.End)
+                }
+            }
+            Spacer(Modifier.height(6.dp))
+            NText("Sehri = end of Sehri (dawn). Iftar = Maghrib. Follow your local mosque.", 10.sp, NGrey)
+        }
+    }
+}
+
 // ---------------------------------------------------------------- TODAY
 @Composable
 fun TodayTab(key: Int, changed: () -> Unit) {
@@ -155,6 +221,8 @@ fun TodayTab(key: Int, changed: () -> Unit) {
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 40.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        RamadanCard(key, now)
+
         NCardBox {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RedDot(7.dp)
@@ -267,7 +335,6 @@ fun MonthTab(key: Int, changed: () -> Unit) {
             }
         }
 
-        // Calendar of dots
         NCardBox {
             NLabel("Calendar")
             Spacer(Modifier.height(10.dp))
@@ -277,7 +344,7 @@ fun MonthTab(key: Int, changed: () -> Unit) {
                 }
             }
             Spacer(Modifier.height(6.dp))
-            val offset = first.dayOfWeek.value - 1 // Monday = 0
+            val offset = first.dayOfWeek.value - 1
             val cells = offset + len
             val rows = (cells + 6) / 7
             for (r in 0 until rows) {
@@ -305,7 +372,6 @@ fun MonthTab(key: Int, changed: () -> Unit) {
             }
         }
 
-        // Daily consistency chart
         NCardBox {
             NLabel("Daily chart")
             Spacer(Modifier.height(12.dp))
@@ -334,7 +400,6 @@ fun MonthTab(key: Int, changed: () -> Unit) {
             }
         }
 
-        // Per prayer
         NCardBox {
             NLabel("By prayer")
             Spacer(Modifier.height(6.dp))
@@ -426,6 +491,21 @@ fun SetupTab(key: Int, changed: () -> Unit) {
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         NCardBox {
+            NLabel("Home screen widget")
+            Spacer(Modifier.height(8.dp))
+            NText("Theme: ${Settings.widgetStyle(ctx).label}  ·  Opacity: ${Settings.widgetOpacity(ctx)}%", 12.sp)
+            Spacer(Modifier.height(12.dp))
+            NButton("Widget theme & opacity", filled = true, modifier = Modifier.fillMaxWidth()) {
+                ctx.startActivity(Intent(ctx, WidgetSettingsActivity::class.java))
+            }
+            Spacer(Modifier.height(10.dp))
+            NText(
+                "Add: long-press home screen > Widgets > Dot Salah. Resize: long-press the widget and drag the edges. Tap a prayer row to tick it. Tap the small dot-gear on the widget to change its look.",
+                11.sp, NGrey
+            )
+        }
+
+        NCardBox {
             NLabel("Time format")
             Spacer(Modifier.height(12.dp))
             val is24 = Settings.use24(ctx)
@@ -483,6 +563,24 @@ fun SetupTab(key: Int, changed: () -> Unit) {
         }
 
         NCardBox {
+            NLabel("Hijri date & Ramadan")
+            Spacer(Modifier.height(10.dp))
+            NText(remember(v) { Hijri.label(Hijri.of(ctx, Salah.today())) }, 15.sp)
+            Spacer(Modifier.height(6.dp))
+            NText(
+                "Sehri & Iftar times appear on the Today tab and widget automatically during Ramadan. If this date is different from the Bangladesh moon-sighting date, adjust it here.",
+                11.sp, NGrey
+            )
+            Spacer(Modifier.height(12.dp))
+            val ha = Settings.hijriAdj(ctx)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                NButton("-1 day") { Settings.setHijriAdj(ctx, ha - 1); update() }
+                NText(if (ha > 0) "+$ha" else "$ha", 14.sp, modifier = Modifier.weight(1f), align = TextAlign.Center)
+                NButton("+1 day") { Settings.setHijriAdj(ctx, ha + 1); update() }
+            }
+        }
+
+        NCardBox {
             NLabel("Reminders")
             Spacer(Modifier.height(12.dp))
             val n = Settings.notify(ctx)
@@ -506,15 +604,18 @@ fun SetupTab(key: Int, changed: () -> Unit) {
             NText("For on-time reminders, set Dot Salah battery use to \"Unrestricted\".", 11.sp, NGrey)
         }
 
-        NCardBox {
-            NLabel("Home screen widget")
-            Spacer(Modifier.height(8.dp))
-            NText(
-                "Long-press your home screen > Widgets > Dot Salah. Drag it on, then long-press and drag the edges to resize. Tap a prayer row on the widget to tick it.",
-                12.sp, NGrey
-            )
+        // About (small)
+        val ver = remember { runCatching { ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName }.getOrNull() ?: "" }
+        Column(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RedDot(5.dp)
+                Spacer(Modifier.width(6.dp))
+                NText("DOT SALAH  v$ver", 10.sp, NGrey, spacing = 1.sp)
+            }
+            Spacer(Modifier.height(4.dp))
+            NText("Developed by Lisun", 10.sp, NGrey)
+            Spacer(Modifier.height(4.dp))
+            NText("Times: Karachi method (18°/18°)", 9.sp, NLine)
         }
-
-        NText("Times: University of Islamic Sciences, Karachi method (18°/18°).", 10.sp, NGrey)
     }
 }

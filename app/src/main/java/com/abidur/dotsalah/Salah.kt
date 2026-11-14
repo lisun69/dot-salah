@@ -3,10 +3,11 @@ package com.abidur.dotsalah
 import android.content.Context
 import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.chrono.HijrahDate
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoField
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.acos
@@ -58,7 +59,6 @@ object PrayerCalc {
         return floor(365.25 * (y + 4716)) + floor(30.6001 * (m + 1)) + d + b - 1524.5
     }
 
-    /** returns [declination, equationOfTime] */
     private fun sun(jd: Double): DoubleArray {
         val d = jd - 2451545.0
         val g = fixAngle(357.529 + 0.98560028 * d)
@@ -101,7 +101,7 @@ object PrayerCalc {
 }
 
 /** One day's times as epoch millis. prayers[0..4] = Fajr..Isha. */
-class DayTimes(val date: LocalDate, val prayers: LongArray, val sunrise: Long)
+class DayTimes(val date: LocalDate, val prayers: LongArray, val sunrise: Long, val sehri: Long, val iftar: Long)
 
 object Settings {
     private fun p(c: Context) = c.applicationContext.getSharedPreferences("salah_settings", Context.MODE_PRIVATE)
@@ -131,6 +131,19 @@ object Settings {
 
     fun lastNotified(c: Context) = p(c).getLong("lastNotified", 0L)
     fun setLastNotified(c: Context, v: Long) = p(c).edit().putLong("lastNotified", v).apply()
+
+    // ---- widget look (new in 1.1) ----
+    fun widgetStyle(c: Context): WidgetStyle =
+        WidgetStyle.values().getOrElse(p(c).getInt("wStyle", 0)) { WidgetStyle.AMOLED }
+    fun setWidgetStyle(c: Context, s: WidgetStyle) = p(c).edit().putInt("wStyle", s.ordinal).apply()
+
+    /** Background opacity 0..100 % */
+    fun widgetOpacity(c: Context) = p(c).getInt("wOpacity", 100).coerceIn(0, 100)
+    fun setWidgetOpacity(c: Context, v: Int) = p(c).edit().putInt("wOpacity", v.coerceIn(0, 100)).apply()
+
+    // ---- Hijri date (new in 1.1). Bangladesh usually starts months 1 day after Saudi. ----
+    fun hijriAdj(c: Context) = p(c).getInt("hijriAdj", -1)
+    fun setHijriAdj(c: Context, v: Int) = p(c).edit().putInt("hijriAdj", v.coerceIn(-3, 3)).apply()
 }
 
 object Salah {
@@ -146,10 +159,10 @@ object Salah {
         }
         val idx = intArrayOf(0, 2, 3, 4, 5)
         val prayers = LongArray(5) { ms(h[idx[it]], Settings.adj(c, it)) }
-        return DayTimes(date, prayers, ms(h[1], 0))
+        // Sehri ends at true dawn (before the Fajr safety minutes). Iftar = Maghrib.
+        return DayTimes(date, prayers, ms(h[1], 0), ms(h[0], 0), prayers[3])
     }
 
-    /** Next prayer strictly after [now]: (index, time, isTomorrow). */
     fun next(c: Context, now: Long = System.currentTimeMillis()): Triple<Int, Long, Boolean> {
         val t = times(c, Instant.ofEpochMilli(now).atZone(ZONE).toLocalDate())
         for (i in 0..4) if (t.prayers[i] > now) return Triple(i, t.prayers[i], false)
@@ -175,7 +188,6 @@ object Salah {
 
     fun toggle(c: Context, d: LocalDate, i: Int) = set(c, d, i, !isDone(c, d, i))
 
-    /** Full days (5/5) and days counted, for this month up to today. */
     fun monthFull(c: Context, month: LocalDate = today()): Pair<Int, Int> {
         val first = month.withDayOfMonth(1)
         val last = if (first.year == today().year && first.month == today().month) today()
@@ -201,6 +213,65 @@ object Salah {
     }
 }
 
+/** Hijri (Islamic) date, offline. */
+object Hijri {
+    val MONTHS = listOf(
+        "MUHARRAM", "SAFAR", "RABI AL-AWWAL", "RABI AL-THANI", "JUMADA AL-AWWAL", "JUMADA AL-THANI",
+        "RAJAB", "SHABAN", "RAMADAN", "SHAWWAL", "DHUL QADAH", "DHUL HIJJAH"
+    )
+
+    data class HDate(val year: Int, val month: Int, val day: Int)
+
+    fun of(c: Context, date: LocalDate): HDate {
+        val shifted = date.plusDays(Settings.hijriAdj(c).toLong())
+        return runCatching {
+            val h = HijrahDate.from(shifted)
+            HDate(h.get(ChronoField.YEAR_OF_ERA), h.get(ChronoField.MONTH_OF_YEAR), h.get(ChronoField.DAY_OF_MONTH))
+        }.getOrElse { tabular(shifted) }
+    }
+
+    /** Arithmetic Islamic calendar, used if the phone has no Umm al-Qura data. */
+    private fun tabular(date: LocalDate): HDate {
+        val jd = date.toEpochDay() + 2440588L
+        var l = jd - 1948440 + 10632
+        val n = (l - 1) / 10631
+        l = l - 10631 * n + 354
+        val j = ((10985 - l) / 5316) * ((50 * l) / 17719) + (l / 5670) * ((43 * l) / 15238)
+        l = l - ((30 - j) / 15) * ((17719 * j) / 50) - (j / 16) * ((15238 * j) / 43) + 29
+        val m = (24 * l) / 709
+        val d = l - (709 * m) / 24
+        val y = 30 * n + j - 30
+        return HDate(y.toInt(), m.toInt(), d.toInt())
+    }
+
+    fun label(h: HDate) = "${h.day} ${MONTHS[(h.month - 1).coerceIn(0, 11)]} ${h.year}"
+}
+
+object Ramadan {
+    data class Day(val n: Int, val date: LocalDate, val sehri: Long, val iftar: Long)
+
+    /** Ramadan day number today, or null when it is not Ramadan. */
+    fun dayNumber(c: Context, date: LocalDate = Salah.today()): Int? {
+        val h = Hijri.of(c, date)
+        return if (h.month == 9) h.day else null
+    }
+
+    fun timetable(c: Context): List<Day> {
+        val n = dayNumber(c) ?: return emptyList()
+        var d = Salah.today().minusDays((n - 1).toLong())
+        val list = mutableListOf<Day>()
+        var i = 1
+        while (i <= 30) {
+            if (Hijri.of(c, d).month != 9) break
+            val t = Salah.times(c, d)
+            list += Day(i, d, t.sehri, t.iftar)
+            d = d.plusDays(1)
+            i++
+        }
+        return list
+    }
+}
+
 object Fmt {
     private val f24 = DateTimeFormatter.ofPattern("HH:mm", Locale.US)
     private val f12 = DateTimeFormatter.ofPattern("h:mm", Locale.US)
@@ -208,15 +279,11 @@ object Fmt {
 
     private fun z(ms: Long): ZonedDateTime = Instant.ofEpochMilli(ms).atZone(ZONE)
 
-    /** "15:39" or "3:39 PM" */
     fun time(c: Context, ms: Long): String =
         if (Settings.use24(c)) z(ms).format(f24) else z(ms).format(f12) + " " + z(ms).format(ampm).uppercase(Locale.US)
 
-    /** Number part only, for big dot display. */
-    fun timeShort(c: Context, ms: Long): String = if (Settings.use24(c)) z(ms).format(f24) else z(ms).format(f12)
-    fun suffix(c: Context, ms: Long): String = if (Settings.use24(c)) "" else z(ms).format(ampm).uppercase(Locale.US)
-
     fun date(d: LocalDate): String = d.format(DateTimeFormatter.ofPattern("EEE dd MMM", Locale.US)).uppercase(Locale.US)
+    fun shortDate(d: LocalDate): String = d.format(DateTimeFormatter.ofPattern("dd MMM", Locale.US)).uppercase(Locale.US)
     fun monthTitle(d: LocalDate): String = d.format(DateTimeFormatter.ofPattern("MMM yyyy", Locale.US)).uppercase(Locale.US)
 
     fun countdown(ms: Long): String {
@@ -228,7 +295,4 @@ object Fmt {
     }
 
     fun title(name: String) = name.lowercase(Locale.US).replaceFirstChar { it.titlecase(Locale.US) }
-
-    @Suppress("unused")
-    fun localTime(ms: Long): LocalTime = z(ms).toLocalTime()
 }

@@ -1,363 +1,398 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/widget_bg"
-    android:orientation="vertical"
-    android:padding="14dp">
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@null"
+        android:scaleType="fitXY"
+        android:src="@drawable/wbg_amoled" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="14dp">
 
         <LinearLayout
-            android:id="@+id/left_col"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
             <LinearLayout
+                android:id="@+id/left_col"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="7dp"
+                        android:layout_height="7dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/dot_red" />
+
+                    <TextView
+                        android:id="@+id/location"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="7dp"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.12"
+                        android:maxLines="1"
+                        android:text="DHAKA"
+                        android:textColor="#8A8A8A"
+                        android:textSize="11sp" />
+
+                    <ImageView
+                        android:id="@+id/settings_btn"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:contentDescription="Widget settings"
+                        android:padding="3dp"
+                        android:src="@drawable/ic_widget_settings" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/next_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:fontFamily="monospace"
+                    android:maxLines="1"
+                    android:text="NEXT"
+                    android:textColor="#8A8A8A"
+                    android:textSize="9sp" />
+
+                <ImageView
+                    android:id="@+id/next_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_weight="1"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="Next prayer"
+                    android:maxHeight="34dp"
+                    android:scaleType="fitStart" />
+
+                <TextView
+                    android:id="@+id/next_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="monospace"
+                    android:maxLines="1"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp" />
+
+                <Chronometer
+                    android:id="@+id/countdown"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:maxLines="1"
+                    android:textColor="#D71921"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/ramadan_line"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:fontFamily="monospace"
+                    android:maxLines="1"
+                    android:textColor="#D71921"
+                    android:textSize="9sp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/divider"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="#262626" />
+
+            <LinearLayout
+                android:id="@+id/right_col"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1.15"
+                android:orientation="vertical">
+            <LinearLayout
+                android:id="@+id/row0"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <ImageView
-                    android:layout_width="7dp"
-                    android:layout_height="7dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/dot_red" />
-
                 <TextView
-                    android:id="@+id/location"
-                    android:layout_width="match_parent"
+                    android:id="@+id/name0"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="7dp"
+                    android:layout_weight="1"
                     android:ellipsize="end"
                     android:fontFamily="monospace"
-                    android:letterSpacing="0.12"
                     android:maxLines="1"
-                    android:text="DHAKA"
-                    android:textColor="#8A8A8A"
+                    android:textColor="#FFFFFF"
                     android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/time0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:maxLines="1"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp" />
+
+                <ImageView
+                    android:id="@+id/tick0"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginStart="8dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/tick_future" />
             </LinearLayout>
-
-            <TextView
-                android:id="@+id/next_label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="monospace"
-                android:maxLines="1"
-                android:text="NEXT"
-                android:textColor="#8A8A8A"
-                android:textSize="9sp" />
-
-            <ImageView
-                android:id="@+id/next_name"
+            <LinearLayout
+                android:id="@+id/row1"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginTop="4dp"
                 android:layout_weight="1"
-                android:adjustViewBounds="true"
-                android:contentDescription="Next prayer"
-                android:maxHeight="34dp"
-                android:scaleType="fitStart" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/next_time"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:fontFamily="monospace"
-                android:maxLines="1"
-                android:textColor="#FFFFFF"
-                android:textSize="15sp" />
+                <TextView
+                    android:id="@+id/name1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:fontFamily="monospace"
+                    android:maxLines="1"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp" />
 
-            <Chronometer
-                android:id="@+id/countdown"
+                <TextView
+                    android:id="@+id/time1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:maxLines="1"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp" />
+
+                <ImageView
+                    android:id="@+id/tick1"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginStart="8dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/tick_future" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/row2"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:maxLines="1"
-                android:textColor="#D71921"
-                android:textSize="11sp" />
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/name2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:fontFamily="monospace"
+                    android:maxLines="1"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/time2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:maxLines="1"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp" />
+
+                <ImageView
+                    android:id="@+id/tick2"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginStart="8dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/tick_future" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/row3"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/name3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:fontFamily="monospace"
+                    android:maxLines="1"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/time3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:maxLines="1"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp" />
+
+                <ImageView
+                    android:id="@+id/tick3"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginStart="8dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/tick_future" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/row4"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/name4"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:fontFamily="monospace"
+                    android:maxLines="1"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/time4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:maxLines="1"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp" />
+
+                <ImageView
+                    android:id="@+id/tick4"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginStart="8dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/tick_future" />
+            </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
 
-        <FrameLayout
-            android:id="@+id/divider"
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:background="#262626" />
-
         <LinearLayout
-            android:id="@+id/right_col"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1.15"
+            android:id="@+id/bars"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
             android:orientation="vertical">
-        <LinearLayout
-            android:id="@+id/row0"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/name0"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:fontFamily="monospace"
-                android:maxLines="1"
-                android:textColor="#FFFFFF"
-                android:textSize="11sp" />
+                android:layout_marginTop="5dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/time0"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/label_today"
+                    android:layout_width="52dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:maxLines="1"
+                    android:text="TODAY"
+                    android:textColor="#8A8A8A"
+                    android:textSize="9sp" />
+
+                <ImageView
+                    android:id="@+id/bar_today"
+                    android:layout_width="0dp"
+                    android:layout_height="7dp"
+                    android:layout_weight="1"
+                    android:contentDescription="@null"
+                    android:scaleType="fitStart" />
+
+                <TextView
+                    android:id="@+id/pct_today"
+                    android:layout_width="44dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:gravity="end"
+                    android:maxLines="1"
+                    android:textColor="#FFFFFF"
+                    android:textSize="9sp" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:maxLines="1"
-                android:textColor="#FFFFFF"
-                android:textSize="11sp" />
+                android:layout_marginTop="5dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-            <ImageView
-                android:id="@+id/tick0"
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:layout_marginStart="8dp"
-                android:contentDescription="@null"
-                android:src="@drawable/tick_future" />
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/row1"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/label_month"
+                    android:layout_width="52dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:maxLines="1"
+                    android:text="MONTH"
+                    android:textColor="#8A8A8A"
+                    android:textSize="9sp" />
 
-            <TextView
-                android:id="@+id/name1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:fontFamily="monospace"
-                android:maxLines="1"
-                android:textColor="#FFFFFF"
-                android:textSize="11sp" />
+                <ImageView
+                    android:id="@+id/bar_month"
+                    android:layout_width="0dp"
+                    android:layout_height="7dp"
+                    android:layout_weight="1"
+                    android:contentDescription="@null"
+                    android:scaleType="fitStart" />
 
-            <TextView
-                android:id="@+id/time1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:maxLines="1"
-                android:textColor="#FFFFFF"
-                android:textSize="11sp" />
-
-            <ImageView
-                android:id="@+id/tick1"
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:layout_marginStart="8dp"
-                android:contentDescription="@null"
-                android:src="@drawable/tick_future" />
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/row2"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/name2"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:fontFamily="monospace"
-                android:maxLines="1"
-                android:textColor="#FFFFFF"
-                android:textSize="11sp" />
-
-            <TextView
-                android:id="@+id/time2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:maxLines="1"
-                android:textColor="#FFFFFF"
-                android:textSize="11sp" />
-
-            <ImageView
-                android:id="@+id/tick2"
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:layout_marginStart="8dp"
-                android:contentDescription="@null"
-                android:src="@drawable/tick_future" />
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/row3"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/name3"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:fontFamily="monospace"
-                android:maxLines="1"
-                android:textColor="#FFFFFF"
-                android:textSize="11sp" />
-
-            <TextView
-                android:id="@+id/time3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:maxLines="1"
-                android:textColor="#FFFFFF"
-                android:textSize="11sp" />
-
-            <ImageView
-                android:id="@+id/tick3"
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:layout_marginStart="8dp"
-                android:contentDescription="@null"
-                android:src="@drawable/tick_future" />
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/row4"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/name4"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:fontFamily="monospace"
-                android:maxLines="1"
-                android:textColor="#FFFFFF"
-                android:textSize="11sp" />
-
-            <TextView
-                android:id="@+id/time4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:maxLines="1"
-                android:textColor="#FFFFFF"
-                android:textSize="11sp" />
-
-            <ImageView
-                android:id="@+id/tick4"
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:layout_marginStart="8dp"
-                android:contentDescription="@null"
-                android:src="@drawable/tick_future" />
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/pct_month"
+                    android:layout_width="44dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:gravity="end"
+                    android:maxLines="1"
+                    android:textColor="#FFFFFF"
+                    android:textSize="9sp" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/bars"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:orientation="vertical">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="52dp"
-                android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:maxLines="1"
-                android:text="TODAY"
-                android:textColor="#8A8A8A"
-                android:textSize="9sp" />
-
-            <ImageView
-                android:id="@+id/bar_today"
-                android:layout_width="0dp"
-                android:layout_height="7dp"
-                android:layout_weight="1"
-                android:contentDescription="@null"
-                android:scaleType="fitStart" />
-
-            <TextView
-                android:id="@+id/pct_today"
-                android:layout_width="44dp"
-                android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:gravity="end"
-                android:maxLines="1"
-                android:textColor="#FFFFFF"
-                android:textSize="9sp" />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="52dp"
-                android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:maxLines="1"
-                android:text="MONTH"
-                android:textColor="#8A8A8A"
-                android:textSize="9sp" />
-
-            <ImageView
-                android:id="@+id/bar_month"
-                android:layout_width="0dp"
-                android:layout_height="7dp"
-                android:layout_weight="1"
-                android:contentDescription="@null"
-                android:scaleType="fitStart" />
-
-            <TextView
-                android:id="@+id/pct_month"
-                android:layout_width="44dp"
-                android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:gravity="end"
-                android:maxLines="1"
-                android:textColor="#FFFFFF"
-                android:textSize="9sp" />
-        </LinearLayout>
-    </LinearLayout>
-</LinearLayout>
+</FrameLayout>

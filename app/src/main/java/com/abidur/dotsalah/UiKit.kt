@@ -123,30 +123,29 @@ fun DotText(text: String, dot: Dp, color: Color, modifier: Modifier = Modifier, 
 }
 
 @Composable
-fun BigDot(text: String, color: Color, maxDot: Dp = 9.dp, modifier: Modifier = Modifier) {
+fun BigDot(text: String, color: Color, maxDot: Dp = 9.dp, modifier: Modifier = Modifier, ghost: Color = NGhost) {
     BoxWithConstraints(modifier.fillMaxWidth()) {
         val cols = DotFont.columns(text).coerceAtLeast(1)
         val fit = maxWidth / cols
         val dot = if (fit < maxDot) fit else maxDot
-        DotText(text, dot, color, ghost = NGhost)
+        DotText(text, dot, color, ghost = ghost)
     }
 }
 
 @Composable
-fun DotProgress(fraction: Float, modifier: Modifier = Modifier, count: Int = 24, lit: Color = NWhite) {
+fun DotProgress(fraction: Float, modifier: Modifier = Modifier, count: Int = 24, lit: Color = NWhite, ghost: Color = NGhost) {
     Canvas(modifier.fillMaxWidth().height(10.dp)) {
         val cell = size.width / count
         val r = minOf(cell, size.height) * 0.38f
         val on = (fraction.coerceIn(0f, 1f) * count).roundToInt()
         for (i in 0 until count) {
-            drawCircle(if (i < on) lit else NGhost, r, Offset(cell * i + cell / 2f, size.height / 2f))
+            drawCircle(if (i < on) lit else ghost, r, Offset(cell * i + cell / 2f, size.height / 2f))
         }
     }
 }
 
-/** 5 segments x 4 dots: each prayer = 20%. */
 @Composable
-fun SegmentProgress(done: Int, modifier: Modifier = Modifier) {
+fun SegmentProgress(done: Int, modifier: Modifier = Modifier, ghost: Color = NGhost) {
     Canvas(modifier.fillMaxWidth().height(12.dp)) {
         val perSeg = 4
         val total = 5 * perSeg + 4
@@ -155,7 +154,7 @@ fun SegmentProgress(done: Int, modifier: Modifier = Modifier) {
         var x = 0
         for (s in 0 until 5) {
             for (d in 0 until perSeg) {
-                drawCircle(if (s < done) NRed else NGhost, r, Offset(cell * x + cell / 2f, size.height / 2f))
+                drawCircle(if (s < done) NRed else ghost, r, Offset(cell * x + cell / 2f, size.height / 2f))
                 x++
             }
             x++
@@ -163,9 +162,8 @@ fun SegmentProgress(done: Int, modifier: Modifier = Modifier) {
     }
 }
 
-/** Round tick: filled red with white check when done, white ring when due, faint ring when not yet. */
 @Composable
-fun Tick(done: Boolean, due: Boolean, size: Dp = 30.dp, modifier: Modifier = Modifier) {
+fun Tick(done: Boolean, due: Boolean, size: Dp = 30.dp, modifier: Modifier = Modifier, ring: Color = NWhite, faint: Color = NGhost) {
     Canvas(modifier.size(size)) {
         val r = this.size.minDimension / 2f
         val c = Offset(this.size.width / 2f, this.size.height / 2f)
@@ -179,7 +177,7 @@ fun Tick(done: Boolean, due: Boolean, size: Dp = 30.dp, modifier: Modifier = Mod
             p.lineTo(w * 0.71f, h * 0.36f)
             drawPath(p, NWhite, style = Stroke(width = r * 0.22f, cap = StrokeCap.Round, join = StrokeJoin.Round))
         } else {
-            drawCircle(if (due) NWhite else NGhost, r - r * 0.08f, c, style = Stroke(width = r * 0.14f))
+            drawCircle(if (due) ring else faint, r - r * 0.08f, c, style = Stroke(width = r * 0.14f))
         }
     }
 }

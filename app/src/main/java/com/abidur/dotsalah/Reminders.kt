@@ -22,7 +22,6 @@ const val ACTION_MIDNIGHT = "com.abidur.dotsalah.MIDNIGHT"
 const val ACTION_TOGGLE = "com.abidur.dotsalah.TOGGLE"
 const val ACTION_MARK = "com.abidur.dotsalah.MARK"
 
-/** Sets the next alarm (next prayer) and a midnight refresh. */
 object Scheduler {
     fun schedule(c: Context) {
         val ctx = c.applicationContext
@@ -111,7 +110,6 @@ object Notifier {
     fun test(c: Context) = show(c, Salah.next(c).first, Salah.next(c).second)
 }
 
-/** Handles alarms, widget taps and the notification button. */
 class SalahReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val c = context.applicationContext
@@ -154,7 +152,6 @@ class SalahReceiver : BroadcastReceiver() {
     }
 }
 
-/** Re-sets alarms after restart, update or clock change. */
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val c = context.applicationContext
